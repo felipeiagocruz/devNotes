@@ -1,52 +1,76 @@
-import { useRef } from "react";
+import { SetStateAction, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { collectionsActions } from "../../store/collectionsSlice";
 import AuthRootState from "../../models/AuthRootState";
-import CollectionRootState from "../../models/CollectionRootState";
+
+import Note from "./Note";
 
 type CollectionProps = {
   id: string;
   collectionName: string;
+  notations: {}[];
+  isLoading: boolean;
+  setIsLoading: (value: boolean) => void;
+  fetchData: () => Promise<any>;
 };
 
 const Collection = (props: CollectionProps) => {
+  const [notes, setNotes] = useState([]);
   const user = useSelector((state: AuthRootState) => state.authSlice.user);
   const dispatch = useDispatch();
   const addNoteInput = useRef<HTMLInputElement | null>(null);
-  const notes = useSelector(
-    (state: CollectionRootState) => state.collectionsSlice.collections
+  const notesData = useSelector((state: any) =>
+    state.collectionsSlice.collections.filter(
+      (collection: { id: string }) => collection.id === props.id
+    )
   );
 
+  const transformNotes = () => {
+    const transformedCollections = [];
+    for (const key in notesData) {
+      const collectionObj = {
+        ...notesData[key],
+      };
+      transformedCollections.push(collectionObj);
+    }
+    const transformedNotes: any = [];
+
+    transformedCollections.map((collection) => {
+      for (const key in collection) {
+        if (collection.id) {
+          const noteObj = {
+            id: key,
+            ...collection[key],
+          };
+          transformedNotes.push(noteObj);
+        }
+      }
+      transformedNotes.shift();
+      return transformedNotes;
+    });
+    console.log(transformedNotes);
+    setNotes(transformedNotes);
+  };
+
+  useEffect(() => {
+    transformNotes();
+  }, [props.isLoading]);
+
   const onSaveHandler = async () => {
-    dispatch(
-      collectionsActions.editColletion({
-        id: props.id,
-        notations: {
-          img: "a",
-          url: "a",
-          notation: "a",
-        },
-      })
-    );
     const data = await fetch(
       `https://devnotes-b1a97-default-rtdb.firebaseio.com/users/${user?.uid}/collections/${props.id}.json?access_token=${user?.token}`,
       {
-        method: "PUT",
+        method: "POST",
         headers: { "Content-Type": "aplication/json" },
-        body: JSON.stringify({
-          collectionName: props.collectionName,
-          notations: {
-            img: "a",
-            url: "a",
-            notation: addNoteInput.current?.value,
-          },
-        }),
+        body: JSON.stringify({ noteName: addNoteInput.current?.value }),
       }
-    );
+    ).then((data) => props.setIsLoading(true));
+    if (addNoteInput.current?.value !== null) {
+      addNoteInput.current!.value = "";
+    }
   };
   return (
     <div>
-      <p>{props.collectionName}</p>
       <p>{props.id}</p>
       <p>Give note name:</p>
       <form
@@ -58,6 +82,17 @@ const Collection = (props: CollectionProps) => {
         <input type="text" ref={addNoteInput} />
         <button>Add note</button>
       </form>
+      {notes
+        ? notes.map((note: { id: string; noteName: string }) => (
+            <Note
+              id={note.id}
+              noteName={note.noteName}
+              isLoading={props.isLoading}
+              setIsLoading={props.setIsLoading}
+              collectionName={props.id}
+            />
+          ))
+        : ""}
     </div>
   );
 };

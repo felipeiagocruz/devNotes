@@ -1,8 +1,7 @@
-import { Fragment, RefObject, useEffect } from "react";
+import { Fragment, RefObject, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import AuthRootState from "../../models/AuthRootState";
-import CollectionRootState from "../../models/CollectionRootState";
 
 import { useRef } from "react";
 import { collectionsActions } from "../../store/collectionsSlice";
@@ -10,6 +9,7 @@ import { collectionsActions } from "../../store/collectionsSlice";
 import Collection from "./Collection";
 
 const MyCollections = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
   //Creating a ref with the input field
   let collectionInput = useRef<HTMLInputElement | null>(null);
@@ -20,30 +20,26 @@ const MyCollections = () => {
     collectionName: string;
     id: string;
     notations: {}[];
-  }[] = useSelector(
-    (state: CollectionRootState) => state.collectionsSlice.collections
-  );
+  }[] = useSelector((state: any) => state.collectionsSlice.collections);
 
   const postHandler = async (input: RefObject<HTMLInputElement>) => {
     const data = await fetch(
-      `https://devnotes-b1a97-default-rtdb.firebaseio.com/users/${user?.uid}/collections.json?access_token=${user?.token}`,
+      `https://devnotes-b1a97-default-rtdb.firebaseio.com/users/${user?.uid}/collections/${input.current?.value}/.json?access_token=${user?.token}`,
       {
         method: "POST",
         headers: { "Content-Type": "aplication/json" },
-        body: JSON.stringify({
-          collectionName: input.current?.value,
-          notations: [null],
-        }),
+        body: JSON.stringify({ noteName: "My new notes" }),
       }
     );
     if (collectionInput.current?.value !== null) {
       collectionInput.current!.value = "";
     }
+    setIsLoading(true);
   };
 
   const fetchData = async () => {
     const response = await fetch(
-      `https://devnotes-b1a97-default-rtdb.firebaseio.com/users/${user?.uid}/collections.json`
+      `https://devnotes-b1a97-default-rtdb.firebaseio.com/users/${user.uid}/collections.json`
     );
     const data = await response.json();
     console.log(data);
@@ -60,10 +56,10 @@ const MyCollections = () => {
   };
 
   useEffect(() => {
-    fetchData().then((data) =>
-      dispatch(collectionsActions.loadCollection(data))
-    );
-  }, [dispatch]);
+    fetchData()
+      .then((data) => dispatch(collectionsActions.loadCollection(data)))
+      .then((data) => setIsLoading(false));
+  }, [isLoading]);
 
   return (
     <Fragment>
@@ -81,6 +77,10 @@ const MyCollections = () => {
           key={collection.id}
           id={collection.id}
           collectionName={collection.collectionName}
+          notations={collection.notations}
+          isLoading={isLoading}
+          setIsLoading={setIsLoading}
+          fetchData={fetchData}
         />
       ))}
     </Fragment>
