@@ -9,12 +9,16 @@ import { Fragment } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { authActions } from "../../store/authSlice";
 import AuthRootState from "../../models/AuthRootState";
+import { Link } from "react-router-dom";
 
 const Auth = () => {
   const dispatch = useDispatch();
   const user = useSelector((state: AuthRootState) => state.authSlice.user);
 
-  // TODO: Replace the following with your app's Firebase project configuration
+  /**
+   * This is the firebase config to connect with the app. This not have to be
+   * hide because of the secury rules inside firebase.
+   */
   const firebaseConfig = {
     apiKey: "AIzaSyD6lWYSgIDTHpzBTyZCWcb9Nm6sZpFmRPs",
 
@@ -105,6 +109,7 @@ const Auth = () => {
           Login here.
         </button>
       )}
+      <Link to="mycollections">My collection</Link>
     </Fragment>
   );
 };
