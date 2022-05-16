@@ -1,11 +1,14 @@
-import { Fragment, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { AiOutlinePlus } from "react-icons/ai";
 
-import Collection from "./Collection";
+import Card from "../components/Layout/Card";
+import classes from "./MyCollections.module.css";
 
 type MyCollectionsProps = {
   postHandler: (value: any) => void;
   loadedCollections: loadedCollection[];
+  setIsLoading: (value: boolean) => void;
 };
 
 type loadedCollection = {
@@ -16,25 +19,52 @@ type loadedCollection = {
 };
 
 const MyCollections = (props: MyCollectionsProps) => {
+  const [isAddCollection, setIsAddCollection] = useState(false);
+  useEffect(() => {
+    props.setIsLoading(true);
+  }, []);
   //Creating a ref with the input field
   let collectionInput = useRef<HTMLInputElement | null>(null);
   return (
-    <Fragment>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          props.postHandler(collectionInput);
-        }}
-      >
-        <input type="text" ref={collectionInput}></input>
-        <button>Click here to create a new collection</button>
-      </form>
-      {props.loadedCollections.map((collection) => (
-        <Link to={`/collection/${collection.id}`} key={collection.id}>
-          {collection.id}
-        </Link>
-      ))}
-    </Fragment>
+    <Card>
+      <header className={classes.header}>
+        <h1 className={classes.headerItem}>My collections</h1>{" "}
+        <span className={classes.headerItem}>
+          <AiOutlinePlus
+            onClick={() => {
+              setIsAddCollection(!isAddCollection);
+            }}
+          />
+        </span>
+      </header>
+      <hr />
+      {isAddCollection && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            props.postHandler(collectionInput);
+          }}
+          className={classes.formNewCollection}
+        >
+          <p>
+            <label>New collectioon name:</label>
+          </p>
+          <p>
+            <input type="text" ref={collectionInput}></input>
+            <button>Create</button>
+          </p>
+          <hr />
+        </form>
+      )}
+
+      <ul className={classes.collectionList}>
+        {props.loadedCollections.map((collection) => (
+          <Link to={`/mycollections/${collection.id}`} key={collection.id}>
+            <li key={collection.id}>{collection.id}</li>
+          </Link>
+        ))}
+      </ul>
+    </Card>
   );
 };
 

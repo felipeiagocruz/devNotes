@@ -1,9 +1,11 @@
-import Auth from "./components/Auth/Auth";
+import NavBar from "./components/Layout/NavBar";
 import AuthRootState from "./models/AuthRootState";
 import "./App.css";
 import MyCollections from "./pages/MyCollections";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Collection from "./pages/Collection";
+import Note from "./pages/Note";
+import Home from "./pages/Home";
 import { useDispatch, useSelector } from "react-redux";
 import { collectionsActions } from "./store/collectionsSlice";
 import { RefObject, useEffect, useState } from "react";
@@ -36,7 +38,7 @@ function App() {
    * @param input is a useRef to the input field inside the form.
    */
   const postHandler = async (input: RefObject<HTMLInputElement>) => {
-    const data = await fetch(
+    const response = await fetch(
       `https://devnotes-b1a97-default-rtdb.firebaseio.com/users/${user?.uid}/collections/${input.current?.value}/.json?access_token=${user?.token}`,
       {
         method: "POST",
@@ -61,7 +63,6 @@ function App() {
       `https://devnotes-b1a97-default-rtdb.firebaseio.com/users/${user.uid}/collections.json`
     );
     const data = await response.json();
-    console.log(data);
     const transformedCollections = [];
 
     for (const key in data) {
@@ -81,9 +82,9 @@ function App() {
   }, [isLoading]);
   return (
     <div className="App">
-      <h1>Welcome to devNotes</h1>
-      <Auth />
+      <NavBar />
       <Routes>
+        <Route path="/" element={<Home />} />
         <Route
           path="mycollections"
           element={
@@ -91,6 +92,7 @@ function App() {
               <MyCollections
                 loadedCollections={loadedCollections}
                 postHandler={postHandler}
+                setIsLoading={setIsLoading}
               />
             ) : (
               <Navigate to="/" />
@@ -98,14 +100,20 @@ function App() {
           }
         />
         <Route
-          path="collection/:collectionId"
+          path="mycollections/:collectionId"
           element={
             user.uid ? (
-              <Collection
-                fetchData={fetchData}
-                isLoading={isLoading}
-                setIsLoading={setIsLoading}
-              />
+              <Collection isLoading={isLoading} setIsLoading={setIsLoading} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+        <Route
+          path="mycollections/:collectionId/note/:noteId"
+          element={
+            user.uid ? (
+              <Note isLoading={isLoading} setIsLoading={setIsLoading} />
             ) : (
               <Navigate to="/" />
             )

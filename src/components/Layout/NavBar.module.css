@@ -1,0 +1,29 @@
+.welcomebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.welcomeItem {
+  grid-row-start: 1;
+  grid-row-end: 2;
+}
+
+.welcomeItem h1 {
+  width: 250%;
+}
+
+.navBar {
+  list-style-type: none;
+  margin: 0px;
+  padding-left: 0.1em;
+}
+
+.navBar li {
+  display: inline-block;
+}
+.navBar li a {
+  color: black;
+  padding-right: 1em;
+}

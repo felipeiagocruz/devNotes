@@ -5,11 +5,13 @@ import {
   GoogleAuthProvider,
   signOut,
 } from "firebase/auth";
-import { Fragment } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { authActions } from "../../store/authSlice";
 import AuthRootState from "../../models/AuthRootState";
-import { Link } from "react-router-dom";
+
+import { GrLogin, GrLogout } from "react-icons/gr";
+
+import classes from "./Auth.module.css";
 
 const Auth = () => {
   const dispatch = useDispatch();
@@ -51,6 +53,7 @@ const Auth = () => {
         // The signed-in user info.
         const userData = result.user;
         // ...
+
         dispatch(
           authActions.logIn({
             displayName: userData.displayName,
@@ -85,32 +88,45 @@ const Auth = () => {
   };
 
   return (
-    <Fragment>
-      <p>Auth</p>
+    <div>
       {user.uid ? (
-        <div>
-          <p>{user.displayName}</p>
-          <p>{user.photo ? <img src={user.photo} alt="User photo" /> : ""}</p>
-
-          <button
-            onClick={() => {
-              signOutHandler();
-            }}
-          >
-            Logout.
-          </button>
+        <div className={classes.authContainer}>
+          <div>
+            {user.photo ? (
+              <img
+                className={classes.profilePic}
+                src={user.photo}
+                alt="User photo"
+              />
+            ) : (
+              ""
+            )}
+            <span>{user.displayName}</span>
+            <button
+              className={classes.logOut}
+              onClick={() => {
+                signOutHandler();
+              }}
+            >
+              <GrLogout />
+            </button>
+          </div>
         </div>
       ) : (
-        <button
-          onClick={() => {
-            signInHandler();
-          }}
-        >
-          Login here.
-        </button>
+        <div className={classes.authContainer}>
+          <div>
+            <button
+              className={classes.logIn}
+              onClick={() => {
+                signInHandler();
+              }}
+            >
+              Login <GrLogin />
+            </button>
+          </div>
+        </div>
       )}
-      <Link to="mycollections">My collection</Link>
-    </Fragment>
+    </div>
   );
 };
 

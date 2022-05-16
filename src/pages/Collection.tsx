@@ -1,20 +1,25 @@
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import AuthRootState from "../models/AuthRootState";
+import Card from "../components/Layout/Card";
+import { AiOutlinePlus, AiFillDelete } from "react-icons/ai";
+import classes from "./Collection.module.css";
 
-import Note from "../components/Collections/Note";
+import { Link, Navigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 
 type CollectionProps = {
   isLoading: boolean;
   setIsLoading: (value: boolean) => void;
-  fetchData: () => Promise<any>;
 };
 
 const Collection = (props: CollectionProps) => {
+  const [isAddNote, setIsAddNote] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const params = useParams();
   const { collectionId } = params;
   const [notes, setNotes] = useState([]);
+  const [deleteRedirect, setDeleteRedirect] = useState(false);
   const user = useSelector((state: AuthRootState) => state.authSlice.user);
   const addNoteInput = useRef<HTMLInputElement | null>(null);
   const addURLInput = useRef<HTMLInputElement | null>(null);
@@ -51,7 +56,6 @@ const Collection = (props: CollectionProps) => {
       transformedNotes.shift();
       return transformedNotes;
     });
-    console.log(transformedNotes);
     setNotes(transformedNotes);
   };
 
@@ -83,6 +87,9 @@ const Collection = (props: CollectionProps) => {
     if (addNoteInput.current?.value !== null) {
       addNoteInput.current!.value = "";
     }
+    if (addURLInput.current?.value !== null) {
+      addURLInput.current!.value = "";
+    }
   };
   const onDeleteHandler = async () => {
     const data = await fetch(
@@ -92,46 +99,90 @@ const Collection = (props: CollectionProps) => {
         headers: { "Content-Type": "aplication/json" },
       }
     ).then((data) => props.setIsLoading(true));
+    setDeleteRedirect(true);
   };
 
   return (
-    <div>
-      <p>{collectionId}</p>
-      <p>Give note name:</p>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          onSaveHandler();
-        }}
-      >
-        <label id="notename">Note name:</label>
-        <input id="notename" type="text" ref={addNoteInput} />
-        <label id="noteurl">URL:</label>
-        <input id="noteurl" type="text" ref={addURLInput} />
-        <button>Add note</button>
-      </form>
-      <button onClick={onDeleteHandler}>Delete collection</button>
-      {notes
-        ? notes.map(
-            (note: {
-              id: string;
-              noteName: string;
-              url: string;
-              img: string;
-            }) => (
-              <Note
-                id={note.id}
-                noteName={note.noteName}
-                noteURL={note.url}
-                noteImg={note.img}
-                isLoading={props.isLoading}
-                setIsLoading={props.setIsLoading}
-                collectionName={collectionId}
+    <Card>
+      {deleteRedirect == false ? (
+        <Fragment>
+          <header className={classes.header}>
+            <h1>
+              My collections {">"} {collectionId}
+            </h1>
+            <span className={classes.headerItem}>
+              <AiOutlinePlus
+                onClick={() => {
+                  setIsAddNote(!isAddNote);
+                }}
               />
-            )
-          )
-        : ""}
-    </div>
+              <AiFillDelete
+                onClick={() => {
+                  setIsDeleting(!isDeleting);
+                }}
+              />
+            </span>
+          </header>
+
+          <hr />
+
+          {isAddNote && (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                onSaveHandler();
+              }}
+              className={classes.formNewNote}
+            >
+              <p>
+                <label id="notename">Note name:</label>
+              </p>
+              <p>
+                <input id="notename" type="text" ref={addNoteInput} />
+              </p>
+              <p>
+                <label id="noteurl">URL:</label>
+              </p>
+              <p>
+                <input id="noteurl" type="text" ref={addURLInput} />
+              </p>
+              <button className={classes.button}>Add note</button>
+              <hr />
+            </form>
+          )}
+          {isDeleting && (
+            <div className={classes.formDelete}>
+              <h2>Are you sure that you wanna delete this collection?</h2>
+              <button className={classes.button} onClick={onDeleteHandler}>
+                Yes, delete this collection
+              </button>
+              <hr />
+            </div>
+          )}
+
+          {notes
+            ? notes.map(
+                (note: { id: string; noteName: string; img: string }) => (
+                  <div className={classes.note}>
+                    <Link to={`note/${note.id}`} replace>
+                      <p>{note.noteName}</p>
+                    </Link>
+                    <p>
+                      <img
+                        src={note.img || "https://img.youtube.com/vi/0/0.jpg"}
+                        alt=""
+                      />
+                    </p>
+                    <hr />
+                  </div>
+                )
+              )
+            : ""}
+        </Fragment>
+      ) : (
+        <Navigate to="/mycollections" />
+      )}
+    </Card>
   );
 };
 

@@ -1,0 +1,33 @@
+.profilePic {
+  width: 2em;
+  border-radius: 50%;
+  padding-right: 0.5em;
+}
+
+.authContainer {
+  width: 100%;
+}
+
+.authContainer div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@media only screen and (max-width: 720px) {
+  .authContainer span {
+    display: none;
+  }
+}
+
+.logIn {
+}
+
+.logOut {
+  padding-left: 0.6em;
+  height: 2em;
+  margin-left: 0.5em;
+  background-color: rgb(235, 52, 52);
+  border-color: rgb(235, 52, 52);
+  border-radius: 50%;
+}

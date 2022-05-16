@@ -1,0 +1,37 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.headerItem svg {
+  font-size: 2.5em;
+}
+
+.headerItem svg:hover {
+  color: lightblue;
+}
+
+.formNewCollection p {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0px;
+  margin-bottom: 0.9em;
+}
+
+.formNewCollection input {
+  width: 100%;
+  border-radius: 5px;
+  border-color: gray;
+  height: 1.5em;
+}
+.formNewCollection button {
+  margin-left: 0.5em;
+  background-color: lightgray;
+  border-radius: 5px;
+}
+
+.collectionList a {
+  font-size: large;
+  color: black;
+}
