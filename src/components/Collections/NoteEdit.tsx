@@ -10,6 +10,7 @@ type NoteEditProps = {
   noteUrl: string | undefined;
   noteImg: string | undefined;
   noteNotes: string | undefined;
+  noteEmbedVideo: string | undefined;
   deleteRedirect: boolean;
   onSaveNoteHandler: (
     noteEditName: string | undefined,
@@ -45,12 +46,15 @@ const NoteEdit = (props: NoteEditProps) => {
         <div>
           <header className={classes.header}>
             <h1>{`My collections > ${props.collectionId} > ${props.noteName}`}</h1>
-            <span className={classes.headerItem}>
+            <span className={classes.npmheaderItem}>
               <AiFillEdit />
               <AiFillDelete />
             </span>
           </header>
           <hr />
+          {props.noteEmbedVideo && (
+            <div dangerouslySetInnerHTML={{ __html: props.noteEmbedVideo }} />
+          )}
           <p>
             Name: {props.noteName} - Edit{" "}
             <input type="text" ref={editNoteNameInput} />

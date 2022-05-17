@@ -81,6 +81,7 @@ const Collection = (props: CollectionProps) => {
           noteName: addNoteInput.current?.value,
           url: videoURL,
           img: `https://img.youtube.com/vi/${videoId}/0.jpg`,
+          embedVideo: `<iframe width="560" height="315" src="https://www.youtube.com/embed/${videoId}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`,
         }),
       }
     ).then((data) => props.setIsLoading(true));
