@@ -7,7 +7,7 @@ const NavBar = () => {
     <div>
       <div className={classes.welcomebar}>
         <div className={classes.welcomeItem}>
-          <h1>Welcome to devNotes</h1>
+          <h1>devNotes</h1>
         </div>
         <div className={classes.welcomeItem}>
           <Auth />

@@ -21,6 +21,10 @@
 }
 
 .logIn {
+  margin-left: 0.5em;
+  background-color: lightgray;
+  border-radius: 5px;
+  height: 2.3em;
 }
 
 .logOut {

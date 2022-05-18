@@ -39,7 +39,7 @@ function App() {
    */
   const postHandler = async (input: RefObject<HTMLInputElement>) => {
     const response = await fetch(
-      `https://devnotes-b1a97-default-rtdb.firebaseio.com/users/${user?.uid}/collections/${input.current?.value}/.json?access_token=${user?.token}`,
+      `https://devnotes-b1a97-default-rtdb.firebaseio.com/users/${user?.uid}/collections/${input.current?.value}/.json?auth=${user.token}`,
       {
         method: "POST",
         headers: { "Content-Type": "aplication/json" },

@@ -44,12 +44,12 @@ const Auth = () => {
   const auth = getAuth();
   const signInHandler = () => {
     signInWithPopup(auth, provider)
-      .then((result) => {
+      .then(async (result) => {
         // This gives you a Google Access Token. You can use it to access the Google API.
         const credential = GoogleAuthProvider.credentialFromResult(result);
-        if (credential) {
-          const token = credential.accessToken;
-        }
+        // const token = credential!.accessToken;
+        const token = await result.user.getIdTokenResult();
+        console.log(token.token);
         // The signed-in user info.
         const userData = result.user;
         // ...
@@ -60,7 +60,7 @@ const Auth = () => {
             email: userData.email,
             photo: userData.photoURL,
             uid: userData.uid,
-            token: credential?.accessToken,
+            token: token.token,
           })
         );
       })

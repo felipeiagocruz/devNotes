@@ -4,6 +4,10 @@
   justify-content: space-between;
 }
 
+.header h2 {
+  display: none;
+}
+
 .headerItem svg {
   margin-left: 0.5em;
   font-size: 2.5em;
@@ -11,4 +15,41 @@
 
 .headerItem svg:hover {
   color: lightblue;
+}
+
+.noteName {
+  margin-bottom: 0.3em;
+}
+
+.url {
+  margin-top: 0;
+  font-size: smaller;
+  color: black;
+  font-weight: bold;
+}
+
+.url a {
+  color: black;
+  font-weight: normal;
+}
+
+.note {
+  width: 100%;
+}
+
+@media only screen and (max-width: 720px) {
+  .header h2 {
+    display: flex;
+  }
+  .header h1 {
+    display: none;
+  }
+  .headerItem svg {
+    margin-left: 0.5em;
+    font-size: 2.5em;
+  }
+  .noteName {
+    font-size: 1em;
+    margin-bottom: 0.3em;
+  }
 }

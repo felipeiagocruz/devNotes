@@ -2,11 +2,13 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import AuthRootState from "../models/AuthRootState";
 import Card from "../components/Layout/Card";
+import Layout from "../components/Layout/Modal";
 import { AiOutlinePlus, AiFillDelete } from "react-icons/ai";
 import classes from "./Collection.module.css";
 
 import { Link, Navigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
+import Modal from "../components/Layout/Modal";
 
 type CollectionProps = {
   isLoading: boolean;
@@ -73,7 +75,7 @@ const Collection = (props: CollectionProps) => {
       .replace("watch?v=", "");
     console.log(videoId);
     const data = await fetch(
-      `https://devnotes-b1a97-default-rtdb.firebaseio.com/users/${user?.uid}/collections/${collectionId}.json?access_token=${user?.token}`,
+      `https://devnotes-b1a97-default-rtdb.firebaseio.com/users/${user?.uid}/collections/${collectionId}.json?auth=${user.token}`,
       {
         method: "POST",
         headers: { "Content-Type": "aplication/json" },
@@ -94,7 +96,7 @@ const Collection = (props: CollectionProps) => {
   };
   const onDeleteHandler = async () => {
     const data = await fetch(
-      `https://devnotes-b1a97-default-rtdb.firebaseio.com/users/${user?.uid}/collections/${collectionId}.json?access_token=${user?.token}`,
+      `https://devnotes-b1a97-default-rtdb.firebaseio.com/users/${user?.uid}/collections/${collectionId}.json?auth=${user.token}`,
       {
         method: "DELETE",
         headers: { "Content-Type": "aplication/json" },
@@ -126,8 +128,12 @@ const Collection = (props: CollectionProps) => {
           </header>
 
           <hr />
-
-          {isAddNote && (
+          <Modal
+            show={isAddNote}
+            onClose={() => {
+              setIsAddNote(false);
+            }}
+          >
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -148,18 +154,21 @@ const Collection = (props: CollectionProps) => {
                 <input id="noteurl" type="text" ref={addURLInput} />
               </p>
               <button className={classes.button}>Add note</button>
-              <hr />
             </form>
-          )}
-          {isDeleting && (
+          </Modal>
+          <Modal
+            show={isDeleting}
+            onClose={() => {
+              setIsDeleting(false);
+            }}
+          >
             <div className={classes.formDelete}>
               <h2>Are you sure that you wanna delete this collection?</h2>
               <button className={classes.button} onClick={onDeleteHandler}>
                 Yes, delete this collection
               </button>
-              <hr />
             </div>
-          )}
+          </Modal>
 
           {notes
             ? notes.map(

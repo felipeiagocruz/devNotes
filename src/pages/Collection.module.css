@@ -20,6 +20,11 @@
   margin-bottom: 0.9em;
 }
 
+.formNewNote p label {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
 .formNewNote input {
   width: 100%;
   border-radius: 5px;

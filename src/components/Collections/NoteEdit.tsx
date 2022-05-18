@@ -1,7 +1,8 @@
-import { useRef } from "react";
+import { Fragment, useRef, useState } from "react";
 import { Navigate } from "react-router-dom";
 import classes from "./NoteEdit.module.css";
 import { AiFillEdit, AiFillDelete } from "react-icons/ai";
+import { MdOutlineOndemandVideo } from "react-icons/md";
 
 type NoteEditProps = {
   collectionId: string | undefined;
@@ -11,6 +12,7 @@ type NoteEditProps = {
   noteImg: string | undefined;
   noteNotes: string | undefined;
   noteEmbedVideo: string | undefined;
+  setIsDeleting: (value: boolean) => void;
   deleteRedirect: boolean;
   onSaveNoteHandler: (
     noteEditName: string | undefined,
@@ -19,6 +21,8 @@ type NoteEditProps = {
   ) => void;
 };
 const NoteEdit = (props: NoteEditProps) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [isVideo, setIsVideo] = useState(false);
   const editNoteNameInput = useRef<HTMLInputElement | null>(null);
   const editNotesInput = useRef<HTMLTextAreaElement | null>(null);
   const editNoteUrlInput = useRef<HTMLInputElement | null>(null);
@@ -29,12 +33,12 @@ const NoteEdit = (props: NoteEditProps) => {
     url: string | undefined
   ) => {
     props.onSaveNoteHandler(notename, notes, url);
-    if (editNoteNameInput.current?.value !== null) {
-      editNoteNameInput.current!.value = "";
-    }
-    if (editNoteUrlInput.current?.value !== null) {
-      editNoteUrlInput.current!.value = "";
-    }
+    // if (editNoteNameInput.current?.value !== null) {
+    //   editNoteNameInput.current!.value = "";
+    // }
+    // if (editNoteUrlInput.current?.value !== null) {
+    //   editNoteUrlInput.current!.value = "";
+    // }
   };
   return (
     <form
@@ -46,50 +50,84 @@ const NoteEdit = (props: NoteEditProps) => {
         <div>
           <header className={classes.header}>
             <h1>{`My collections > ${props.collectionId} > ${props.noteName}`}</h1>
-            <span className={classes.npmheaderItem}>
-              <AiFillEdit />
-              <AiFillDelete />
+            <h2> {props.noteName}</h2>
+            <span className={classes.headerItem}>
+              <MdOutlineOndemandVideo
+                onClick={() => {
+                  setIsVideo(!isVideo);
+                }}
+              />
+              <AiFillEdit
+                onClick={() => {
+                  setIsEditing(!isEditing);
+                }}
+              />
+              <AiFillDelete
+                onClick={() => {
+                  props.setIsDeleting(true);
+                }}
+              />
             </span>
           </header>
           <hr />
-          {props.noteEmbedVideo && (
+
+          <h2 className={classes.noteName}>
+            Note Name:{" "}
+            {isEditing ? (
+              <Fragment>
+                <input
+                  type="text"
+                  defaultValue={props.noteName}
+                  ref={editNoteNameInput}
+                />
+                <button
+                  onClick={() => {
+                    onEdit(
+                      editNoteNameInput.current?.value,
+                      editNotesInput.current?.value,
+                      props.noteUrl || ""
+                    );
+                  }}
+                >
+                  Save
+                </button>
+              </Fragment>
+            ) : (
+              props.noteName
+            )}
+          </h2>
+          <p className={classes.url}>
+            {isEditing ? (
+              <Fragment>
+                <label id="url">Url: </label>
+                <input
+                  id="url"
+                  type="text"
+                  defaultValue={props.noteUrl}
+                  ref={editNoteUrlInput}
+                />
+                <button
+                  onClick={() => {
+                    onEdit(
+                      props.noteName,
+                      editNotesInput.current?.value,
+                      editNoteUrlInput.current?.value
+                    );
+                  }}
+                >
+                  Save
+                </button>
+              </Fragment>
+            ) : (
+              <a href={props.noteUrl}>{props.noteUrl}</a>
+            )}
+          </p>
+          {isVideo && props.noteEmbedVideo && (
             <div dangerouslySetInnerHTML={{ __html: props.noteEmbedVideo }} />
           )}
           <p>
-            Name: {props.noteName} - Edit{" "}
-            <input type="text" ref={editNoteNameInput} />
-            <button
-              onClick={() => {
-                onEdit(
-                  editNoteNameInput.current?.value,
-                  editNotesInput.current?.value,
-                  props.noteUrl || ""
-                );
-              }}
-            >
-              Save
-            </button>
-          </p>
-          <p>
-            Url: {props.noteUrl}
-            <input type="text" ref={editNoteUrlInput} />
-            <button
-              onClick={() => {
-                onEdit(
-                  props.noteName,
-                  editNotesInput.current?.value,
-                  editNoteUrlInput.current?.value
-                );
-              }}
-            >
-              Save
-            </button>
-          </p>
-          <a href={props.noteUrl} target="_blank">
-            <img src={props.noteImg} />
-          </a>
-          <p>
             <textarea
+              className={classes.note}
               onChange={() => {
                 onEdit(
                   props.noteName,
@@ -97,13 +135,11 @@ const NoteEdit = (props: NoteEditProps) => {
                   props.noteUrl
                 );
               }}
-              rows={4}
-              cols={50}
               ref={editNotesInput}
               defaultValue={props.noteNotes}
+              rows={15}
             />
           </p>
-          {props.noteId}
         </div>
       ) : (
         <Navigate to="/mycollections" />

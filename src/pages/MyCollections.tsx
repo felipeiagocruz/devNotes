@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { AiOutlinePlus } from "react-icons/ai";
 
+import Modal from "../components/Layout/Modal";
 import Card from "../components/Layout/Card";
 import classes from "./MyCollections.module.css";
 
@@ -38,7 +39,13 @@ const MyCollections = (props: MyCollectionsProps) => {
         </span>
       </header>
       <hr />
-      {isAddCollection && (
+
+      <Modal
+        show={isAddCollection}
+        onClose={() => {
+          setIsAddCollection(false);
+        }}
+      >
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -46,24 +53,26 @@ const MyCollections = (props: MyCollectionsProps) => {
           }}
           className={classes.formNewCollection}
         >
-          <p>
-            <label>New collectioon name:</label>
-          </p>
+          <h2>New collection name:</h2>
+
           <p>
             <input type="text" ref={collectionInput}></input>
             <button>Create</button>
           </p>
-          <hr />
         </form>
-      )}
+      </Modal>
 
-      <ul className={classes.collectionList}>
-        {props.loadedCollections.map((collection) => (
-          <Link to={`/mycollections/${collection.id}`} key={collection.id}>
-            <li key={collection.id}>{collection.id}</li>
-          </Link>
-        ))}
-      </ul>
+      {props.loadedCollections.length > 0 ? (
+        <ul className={classes.collectionList}>
+          {props.loadedCollections.map((collection) => (
+            <Link to={`/mycollections/${collection.id}`} key={collection.id}>
+              <li key={collection.id}>{collection.id}</li>
+            </Link>
+          ))}
+        </ul>
+      ) : (
+        <h2>Click the "+" button to add your first collection of notes.</h2>
+      )}
     </Card>
   );
 };

@@ -1,0 +1,10 @@
+.button {
+  margin-left: 0.5em;
+  background-color: lightgray;
+  border-radius: 5px;
+  height: 3em;
+}
+
+.deleteModal p {
+  text-align: center;
+}

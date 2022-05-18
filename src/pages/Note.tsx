@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import AuthRootState from "../models/AuthRootState";
 import { useParams } from "react-router-dom";
+import classes from "./Note.module.css";
 import NoteEdit from "../components/Collections/NoteEdit";
 import Card from "../components/Layout/Card";
+import Modal from "../components/Layout/Modal";
 
 type NoteProps = {
   isLoading: boolean;
@@ -19,13 +21,14 @@ const Note = (props: NoteProps) => {
     embedVideo: string;
   }>({ noteName: "", img: "", url: "", notes: "", embedVideo: "" });
   const [deleteRedirect, setDeleteRedirect] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const params = useParams();
   const { collectionId, noteId } = params;
   const user = useSelector((state: AuthRootState) => state.authSlice.user);
 
   const getNoteInfo = async () => {
     const response = await fetch(
-      `https://devnotes-b1a97-default-rtdb.firebaseio.com/users/${user?.uid}/collections/${collectionId}/${noteId}.json?access_token=${user?.token}`
+      `https://devnotes-b1a97-default-rtdb.firebaseio.com/users/${user?.uid}/collections/${collectionId}/${noteId}.json?auth=${user.token}`
     );
     const data = await response.json();
     setNoteData(data);
@@ -44,7 +47,7 @@ const Note = (props: NoteProps) => {
         .replace("watch?v=", "");
     }
     const data = await fetch(
-      `https://devnotes-b1a97-default-rtdb.firebaseio.com/users/${user?.uid}/collections/${collectionId}/${noteId}.json?access_token=${user?.token}`,
+      `https://devnotes-b1a97-default-rtdb.firebaseio.com/users/${user?.uid}/collections/${collectionId}/${noteId}.json?auth=${user.token}`,
       {
         method: "PUT",
         headers: { "Content-Type": "aplication/json" },
@@ -63,7 +66,7 @@ const Note = (props: NoteProps) => {
 
   const onDeleteNoteHandler = async () => {
     const data = await fetch(
-      `https://devnotes-b1a97-default-rtdb.firebaseio.com/users/${user?.uid}/collections/${collectionId}/${noteId}.json?access_token=${user?.token}`,
+      `https://devnotes-b1a97-default-rtdb.firebaseio.com/users/${user?.uid}/collections/${collectionId}/${noteId}.json?auth=${user.token}`,
       {
         method: "DELETE",
         headers: { "Content-Type": "aplication/json" },
@@ -86,10 +89,25 @@ const Note = (props: NoteProps) => {
         noteImg={noteData!.img}
         noteEmbedVideo={noteData.embedVideo}
         noteNotes={noteData!.notes}
+        setIsDeleting={setIsDeleting}
         deleteRedirect={deleteRedirect}
         onSaveNoteHandler={onSaveNoteHandler}
       />
-      <button onClick={onDeleteNoteHandler}>Delete</button>
+      <Modal
+        show={isDeleting}
+        onClose={() => {
+          setIsDeleting(false);
+        }}
+      >
+        <div className={classes.deleteModal}>
+          <h2>Are you sure that you wanna delete this note?</h2>
+          <p>
+            <button className={classes.button} onClick={onDeleteNoteHandler}>
+              Yes, delete this note.
+            </button>
+          </p>
+        </div>
+      </Modal>
     </Card>
   );
 };
